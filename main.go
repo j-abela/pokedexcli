@@ -7,12 +7,16 @@ import (
 )
 
 func main() {
-	input := bufio.NewScanner(os.Stdin)
+	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
-		input.Scan()
-		inputText := input.Text()
+		reader.Scan()
+		inputText := reader.Text()
 		words := cleanInput(inputText)
-		fmt.Printf("Your command was: %s\n", words[0])
+		if len(words) == 0 {
+			continue
+		}
+		commandName := words[0]
+		fmt.Printf("Your command was: %s\n", commandName)
 	}
 }
