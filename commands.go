@@ -1,15 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 )
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
-}
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
@@ -23,16 +18,26 @@ func getCommands() map[string]cliCommand {
 			description: "Displays a help message",
 			callback:    commandHelp,
 		},
+		"map": {
+			name:        "map",
+			description: "Displays next 20 locations in the Pokémon world",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays previous 20 locations in the Pokémon world",
+			callback:    commandMapb,
+		},
 	}
 }
 
-func commandExit() error {
+func commandExit(*config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(*config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -41,5 +46,44 @@ func commandHelp() error {
 		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
 	fmt.Println()
+	return nil
+}
+
+func commandMap(cfg *config) error {
+	var fullURL string
+
+	if cfg.Next != "" {
+		fullURL = cfg.Next
+	} else {
+		fullURL = baseURL + "/location-area/"
+	}
+
+	body, err := pokemonGET(fullURL)
+	if err != nil {
+		return err
+	}
+
+	locationArea := LocationArea{}
+	unmarshalErr := json.Unmarshal(body, &locationArea)
+	if unmarshalErr != nil {
+		return unmarshalErr
+	}
+
+	cfg.Next = locationArea.Next
+	if locationArea.Previous != nil {
+		cfg.Previous = *locationArea.Previous
+	} else {
+		cfg.Previous = ""
+	}
+
+	for _, area := range locationArea.Results {
+		fmt.Println(area.Name)
+	}
+
+	return nil
+}
+
+func commandMapb(cfg *config) error {
+
 	return nil
 }

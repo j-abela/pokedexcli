@@ -15,6 +15,11 @@ func cleanInput(text string) []string {
 
 func startRepl() {
 	reader := bufio.NewScanner(os.Stdin)
+	cfg := &config{
+		Next:     "",
+		Previous: "",
+	}
+
 	for {
 		fmt.Print("Pokedex > ")
 		reader.Scan()
@@ -29,7 +34,7 @@ func startRepl() {
 
 		command, exists := getCommands()[commandName]
 		if exists {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
