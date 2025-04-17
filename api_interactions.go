@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -22,4 +24,25 @@ func pokemonGET(url string) (marshaled []byte, err error) {
 		return []byte{}, err
 	}
 	return body, nil
+}
+
+func mapHelper(body []byte, cfg *config) error {
+	locationArea := LocationArea{}
+	unmarshalErr := json.Unmarshal(body, &locationArea)
+	if unmarshalErr != nil {
+		return unmarshalErr
+	}
+
+	cfg.Next = locationArea.Next
+	if locationArea.Previous != nil {
+		cfg.Previous = *locationArea.Previous
+	} else {
+		cfg.Previous = ""
+	}
+
+	for _, area := range locationArea.Results {
+		fmt.Println(area.Name)
+	}
+
+	return nil
 }

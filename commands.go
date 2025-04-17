@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -63,27 +62,31 @@ func commandMap(cfg *config) error {
 		return err
 	}
 
-	locationArea := LocationArea{}
-	unmarshalErr := json.Unmarshal(body, &locationArea)
+	unmarshalErr := mapHelper(body, cfg)
 	if unmarshalErr != nil {
 		return unmarshalErr
 	}
-
-	cfg.Next = locationArea.Next
-	if locationArea.Previous != nil {
-		cfg.Previous = *locationArea.Previous
-	} else {
-		cfg.Previous = ""
-	}
-
-	for _, area := range locationArea.Results {
-		fmt.Println(area.Name)
-	}
-
 	return nil
 }
 
 func commandMapb(cfg *config) error {
+	var fullURL string
 
+	if cfg.Previous == "" {
+		fmt.Println("you're on the first page")
+		return nil
+	} else {
+		fullURL = cfg.Previous
+	}
+
+	body, err := pokemonGET(fullURL)
+	if err != nil {
+		return err
+	}
+
+	unmarshalErr := mapHelper(body, cfg)
+	if unmarshalErr != nil {
+		return unmarshalErr
+	}
 	return nil
 }
