@@ -1,48 +1,45 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	"time"
+
+	"github.com/j-abela/pokedexcli/internal/pokecache"
 )
 
-func pokemonGET(url string) (marshaled []byte, err error) {
-	result, err := http.Get(url)
-	if err != nil {
-		return []byte{}, err
-	}
-	defer result.Body.Close()
+var pokeCache *pokecache.Cache
 
-	body, err := io.ReadAll(result.Body)
-	if result.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", result.StatusCode, body)
-		return []byte{}, err
-	}
-	if err != nil {
-		return []byte{}, err
-	}
-	return body, nil
+func init() {
+	// Create a cache with a 5-minute (or whatever duration you prefer) expiration
+	pokeCache = pokecache.NewCache(5 * time.Minute)
 }
 
-func mapHelper(body []byte, cfg *config) error {
-	locationArea := LocationArea{}
-	unmarshalErr := json.Unmarshal(body, &locationArea)
-	if unmarshalErr != nil {
-		return unmarshalErr
+func pokemonGET(url string) ([]byte, error) {
+	// Check if the response is in the cache
+	if cachedData, found := pokeCache.Get(url); found {
+		return cachedData, nil
 	}
 
-	cfg.Next = locationArea.Next
-	if locationArea.Previous != nil {
-		cfg.Previous = *locationArea.Previous
-	} else {
-		cfg.Previous = ""
+	// Not in cache, perform the request
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %v", resp.Status)
 	}
 
-	for _, area := range locationArea.Results {
-		fmt.Println(area.Name)
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	// Add the response to the cache
+	pokeCache.Add(url, data)
+
+	return data, nil
 }
