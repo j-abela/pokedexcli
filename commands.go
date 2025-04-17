@@ -28,6 +28,11 @@ func getCommands() map[string]cliCommand {
 			description: "Displays previous 20 locations in the Pokémon world",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Format: 'explore <area_name>'. Displays a list of all Pokémon in a given area.",
+			callback:    commandExplore,
+		},
 	}
 }
 
@@ -110,5 +115,9 @@ func mapHelper(body []byte, cfg *config) error {
 		fmt.Println(area.Name)
 	}
 
+	return nil
+}
+
+func commandExplore(cfg *config) error {
 	return nil
 }
