@@ -206,7 +206,7 @@ func commandInspect(game *Game, cfg *config, params []string) error {
 	if exists {
 		fmt.Printf("Height: %v\nWeight: %v\nStats:\n", pokemon.Height, pokemon.Weight)
 		for _, stat := range pokemon.Stats {
-			fmt.Printf("  -%v: %v\n", stat.Stat.Name, stat.BaseStat)
+			fmt.Printf("  - %v: %v\n", stat.Stat.Name, stat.BaseStat)
 		}
 		fmt.Println("Types:")
 		for _, pkType := range pokemon.Types {
