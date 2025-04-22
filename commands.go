@@ -119,5 +119,22 @@ func mapHelper(body []byte, cfg *config) error {
 }
 
 func commandExplore(cfg *config, params []string) error {
+	fullURL := baseURL + "/location-area/" + params[0]
+
+	body, err := pokemonGET(fullURL)
+	if err != nil {
+		return err
+	}
+
+	locationArea := LocationAreaDetailed{}
+	unmarshalErr := json.Unmarshal(body, &locationArea)
+	if unmarshalErr != nil {
+		return unmarshalErr
+	}
+
+	for _, pokemon := range locationArea.PokemonEncounters {
+		fmt.Println(pokemon.Pokemon.Name)
+	}
+
 	return nil
 }
