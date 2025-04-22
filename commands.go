@@ -45,6 +45,11 @@ func getCommands() map[string]cliCommand {
 			description: "Format: 'inspect <pokemon>'. Displays information on caught Pokémon",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Displays the name of all caught Pokémon",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -182,6 +187,7 @@ func commandCatch(game *Game, cfg *config, params []string) error {
 	fmt.Printf("Throwing a Pokeball at %v...\n", name)
 	if randomChance <= catchThreshold {
 		fmt.Printf("%v was caught!\n", name)
+		fmt.Println("You may now inspect it with the inspect command")
 		caught = true
 	} else {
 		fmt.Printf("%v escaped!\n", name)
@@ -208,6 +214,19 @@ func commandInspect(game *Game, cfg *config, params []string) error {
 		}
 	} else {
 		fmt.Println("you have not caught that pokemon")
+	}
+	return nil
+}
+
+func commandPokedex(game *Game, cfg *config, params []string) error {
+	if len(game.Pokedex) == 0 {
+		fmt.Println("you haven't caught any pokemon yet")
+		return nil
+	}
+
+	fmt.Println("Your Pokedex:")
+	for name := range game.Pokedex {
+		fmt.Printf(" - %v\n", name)
 	}
 	return nil
 }
