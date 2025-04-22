@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 )
 
 func getCommands() map[string]cliCommand {
@@ -32,6 +34,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Format: 'explore <area_name>'. Displays a list of all Pokémon in a given area.",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Format: 'catch <pokemon>'. Tries to catch a Pokémon",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -134,6 +141,49 @@ func commandExplore(cfg *config, params []string) error {
 
 	for _, pokemon := range locationArea.PokemonEncounters {
 		fmt.Println(pokemon.Pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandCatch(cfg *config, params []string) error {
+	fullURL := baseURL + "/pokemon/" + params[0]
+
+	body, err := pokemonGET(fullURL)
+	if err != nil {
+		return err
+	}
+
+	pokemon := Pokemon{}
+	unmarshalErr := json.Unmarshal(body, &pokemon)
+	if unmarshalErr != nil {
+		return unmarshalErr
+	}
+
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	name := pokemon.Name
+	baseExperience := pokemon.BaseExperience
+	randomChance := rnd.Intn(100)
+	catchThreshold := 70 - (baseExperience / 20)
+
+	// Ensure there's always a minimum chance to catch
+	if catchThreshold < 25 {
+		catchThreshold = 25
+	}
+
+	caught := false
+
+	fmt.Printf("Throwing a Pokeball at %v...\n", name)
+	if randomChance <= catchThreshold {
+		fmt.Printf("%v was caught!\n", name)
+		caught = true
+	} else {
+		fmt.Printf("%v escaped!\n", name)
+	}
+
+	if caught {
+
 	}
 
 	return nil
