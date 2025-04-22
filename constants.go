@@ -5,7 +5,7 @@ const baseURL = "https://pokeapi.co/api/v2"
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 // contains urls to paginate through locations

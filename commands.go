@@ -36,13 +36,13 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func commandExit(*config) error {
+func commandExit(cfg *config, params []string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(*config) error {
+func commandHelp(cfg *config, params []string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -54,7 +54,7 @@ func commandHelp(*config) error {
 	return nil
 }
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, params []string) error {
 	var fullURL string
 
 	if cfg.Next != "" {
@@ -75,7 +75,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, params []string) error {
 	var fullURL string
 
 	if cfg.Previous == "" {
@@ -118,6 +118,6 @@ func mapHelper(body []byte, cfg *config) error {
 	return nil
 }
 
-func commandExplore(cfg *config) error {
+func commandExplore(cfg *config, params []string) error {
 	return nil
 }
