@@ -20,6 +20,10 @@ func startRepl() {
 		Previous: "",
 	}
 
+	game := &Game{
+		Pokedex: make(map[string]Pokemon),
+	}
+
 	for {
 		fmt.Print("Pokedex > ")
 		reader.Scan()
@@ -38,7 +42,7 @@ func startRepl() {
 			if len(words) > 1 {
 				params = words[1:]
 			}
-			err := command.callback(cfg, params)
+			err := command.callback(game, cfg, params)
 			if err != nil {
 				fmt.Println(err)
 			}

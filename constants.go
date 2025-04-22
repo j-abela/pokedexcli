@@ -2,10 +2,14 @@ package main
 
 const baseURL = "https://pokeapi.co/api/v2"
 
+type Game struct {
+	Pokedex map[string]Pokemon
+}
+
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, []string) error
+	callback    func(*Game, *config, []string) error
 }
 
 // contains urls to paginate through locations
